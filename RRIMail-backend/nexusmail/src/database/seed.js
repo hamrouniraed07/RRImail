@@ -73,7 +73,7 @@ const seed = async () => {
     depts.forEach((d) => { deptMap[d.name] = d._id; });
 
     // ── Users ────────────────────────────────────────────────────────────────
-    const users = await User.insertMany([
+    const seededUsers = [
       {
         name: config.admin.name,
         email: config.admin.email,
@@ -116,7 +116,12 @@ const seed = async () => {
         role: 'Professor',
         departmentId: deptMap['IT & Systems'],
       },
-    ]);
+    ];
+
+    const users = [];
+    for (const userData of seededUsers) {
+      users.push(await User.create(userData));
+    }
     logger.info('✅ Users created');
 
     const userMap = {};
