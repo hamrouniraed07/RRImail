@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type StatusType = '' | 'error' | 'success'
 
@@ -29,6 +30,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/a
 const signUpRoles = ['Secretary', 'Professor', 'Service Lead', 'Director', 'Admin'] as const
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState<boolean>(true)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [name, setName] = useState<string>('')
@@ -87,6 +89,11 @@ export default function LoginPage() {
       storeAuthSession(payload.data ?? {})
 
       setStatus({ type: 'success', message: payload.message || 'Connexion réussie.' })
+      
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 500)
     } catch (error: unknown) {
       setStatus({
         type: 'error',
