@@ -1,4 +1,4 @@
-# RRIMail Frontend — React + TypeScript (Vite)
+-m "another commit"# RRIMail Frontend — React + TypeScript (Vite)
 
 Frontend UI for the **RRIMail / NexusMail** institutional mail management system.
 
@@ -80,4 +80,9 @@ And the user is stored as:
 - `npm run preview` — preview production build
 
 ---
+
+## Notes / Troubleshooting
+
+- If login/signup fails, verify the backend is running and that CORS allows your frontend origin.
+- Make sure `VITE_API_BASE_URL` points to the correct backend host and port.
 
