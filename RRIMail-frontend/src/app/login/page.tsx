@@ -22,13 +22,18 @@ type AuthResponse = {
     accessToken?: string
     refreshToken?: string
   }
+  errors?: Array<{ field?: string; message: string }>
+}
+
+type LoginPageProps = {
+  onLoginSuccess?: () => void
 }
 
 const initialStatus: Status = { type: '', message: '' }
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api'
 const signUpRoles = ['Secretary', 'Professor', 'Service Lead', 'Director', 'Admin'] as const
 
-export default function LoginPage() {
+export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const [isLogin, setIsLogin] = useState<boolean>(true)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [name, setName] = useState<string>('')
@@ -59,7 +64,9 @@ export default function LoginPage() {
     const payload = (await response.json()) as AuthResponse
 
     if (!response.ok || payload.success === false) {
-      throw new Error(payload.message || 'Une erreur est survenue')
+      const backendMessage = payload.message || 'Une erreur est survenue'
+      const details = payload.errors?.map((error) => `${error.field}: ${error.message}`).join(' | ')
+      throw new Error(details ? `${backendMessage} — ${details}` : backendMessage)
     }
 
     return payload
@@ -85,6 +92,7 @@ export default function LoginPage() {
 
       const payload = await parseAuthResponse(response)
       storeAuthSession(payload.data ?? {})
+      onLoginSuccess?.()
 
       setStatus({ type: 'success', message: payload.message || 'Connexion réussie.' })
     } catch (error: unknown) {
@@ -111,8 +119,13 @@ export default function LoginPage() {
       return
     }
 
-    if (password.length < 8) {
-      setStatus({ type: 'error', message: 'Le mot de passe doit contenir au moins 8 caractères' })
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+    if (!passwordPattern.test(password)) {
+      setStatus({
+        type: 'error',
+        message:
+          'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
+      })
       return
     }
 
